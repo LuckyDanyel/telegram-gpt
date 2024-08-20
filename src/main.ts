@@ -7,7 +7,7 @@ async function bootstrap() {
     app.enableCors({
         origin: ['https://test-luckydanyel.ru'],
         credentials: true,
-        allowedHeaders: '*'
+        allowedHeaders: ['Content-type']
     });
     app.use(cookieParser());
     await app.listen(3002);
