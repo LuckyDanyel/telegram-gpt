@@ -1,7 +1,7 @@
 import { Injectable, Inject, HttpStatus } from '@nestjs/common';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { v4 } from 'uuid';
-import { Request, Response } from 'express';
+import { Request } from 'express';
 import OpenAI from 'openai';
 import DialogEntitiy from 'src/entities/DialogEntitiy';
 import BaseException from 'src/exceptions/BaseException';
@@ -21,7 +21,7 @@ export default class DialogService {
         this.cacheTime = dayMilliseconds;
     }
 
-    public async createDialog(request: Request, response: Response): Promise<DialogEntitiy> {
+    public async createDialog(request: Request): Promise<DialogEntitiy> {
         try {
             const cacheDialog = await this.getDialog(request);
             if(cacheDialog) return cacheDialog;
@@ -37,7 +37,6 @@ export default class DialogService {
             }
 
             await this.cacheManager.set(newDialog.id, JSON.stringify(newDialog), this.cacheTime);
-            response.cookie('dialogId', newDialog.id, { httpOnly: true, domain: 'luckydanyel.ru', sameSite: 'none', secure: true });
             return newDialog;
         } catch (error) {
             throw new BaseException({
@@ -113,11 +112,14 @@ export default class DialogService {
         return this.threadService.getMessages(parsedDialog.threadId);   
     }
 
-    public async sendMessage(request: Request, response: Response, messages: MessageDTO[]): Promise<OpenAI.Beta.Threads.Messages.Message> {
+    public async sendMessage(request: Request, messages: MessageDTO[]): Promise<{ dialogId: string, message: OpenAI.Beta.Threads.Messages.Message }> {
         try {
-            const dialog = await this.createDialog(request, response);
+            const dialog = await this.createDialog(request);
             const message = await this.threadService.sendMessage(dialog.threadId, messages);
-            return message;
+            return {
+                message,
+                dialogId: dialog.id,
+            }
         } catch (error) {
             throw error;
         }

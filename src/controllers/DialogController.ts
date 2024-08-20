@@ -1,4 +1,4 @@
-import { Controller, Get, HttpStatus, HttpCode, Req, Res, Post, Body, ParseArrayPipe } from '@nestjs/common';
+import { Controller, Get, HttpStatus, HttpCode, Req, Res, Post, Body } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { MessageDTO } from 'src/DTO';
 import OpenAI from 'openai';
@@ -27,9 +27,9 @@ export default class DialogController {
         @Body() messages: MessageDTO[],
         @Req() request: Request,  
         @Res({ passthrough: true }) response: Response
-    ): Promise<OpenAI.Beta.Threads.Messages.Message> {
+    ): Promise<{ dialogId: string, message: OpenAI.Beta.Threads.Messages.Message }> {
         try {
-            const dialogMessages = await this.dialogService.sendMessage(request, response, messages);
+            const dialogMessages = await this.dialogService.sendMessage(request, messages);
             return dialogMessages;   
         } catch (error) {
             response.status(error?.status || 500).send(error);
