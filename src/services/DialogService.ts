@@ -1,7 +1,7 @@
 import { Injectable, Inject, HttpStatus } from '@nestjs/common';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { v4 } from 'uuid';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import OpenAI from 'openai';
 import DialogEntitiy from 'src/entities/DialogEntitiy';
 import BaseException from 'src/exceptions/BaseException';
@@ -21,7 +21,7 @@ export default class DialogService {
         this.cacheTime = dayMilliseconds;
     }
 
-    public async createDialog(request: Request): Promise<DialogEntitiy> {
+    public async createDialog(request: Request, response: Response): Promise<DialogEntitiy> {
         try {
             const cacheDialog = await this.getDialog(request);
             if(cacheDialog) return cacheDialog;
@@ -37,6 +37,7 @@ export default class DialogService {
             }
 
             await this.cacheManager.set(newDialog.id, JSON.stringify(newDialog), this.cacheTime);
+            response.cookie('dialogId', newDialog.id, { httpOnly: true, secure: true });
             return newDialog;
         } catch (error) {
             throw new BaseException({
