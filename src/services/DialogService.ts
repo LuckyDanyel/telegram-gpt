@@ -113,9 +113,9 @@ export default class DialogService {
         return this.threadService.getMessages(parsedDialog.threadId);   
     }
 
-    public async sendMessage(request: Request, messages: MessageDTO[]): Promise<{ dialogId: string, message: OpenAI.Beta.Threads.Messages.Message }> {
+    public async sendMessage(request: Request, reposnse: Response, messages: MessageDTO[]): Promise<{ dialogId: string, message: OpenAI.Beta.Threads.Messages.Message }> {
         try {
-            const dialog = await this.createDialog(request);
+            const dialog = await this.createDialog(request, reposnse);
             const message = await this.threadService.sendMessage(dialog.threadId, messages);
             return {
                 message,

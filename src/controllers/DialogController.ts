@@ -29,7 +29,7 @@ export default class DialogController {
         @Res({ passthrough: true }) response: Response
     ): Promise<{ dialogId: string, message: OpenAI.Beta.Threads.Messages.Message }> {
         try {
-            const dialogMessages = await this.dialogService.sendMessage(request, messages);
+            const dialogMessages = await this.dialogService.sendMessage(request, response, messages);
             return dialogMessages;   
         } catch (error) {
             response.status(error?.status || 500).send(error);
