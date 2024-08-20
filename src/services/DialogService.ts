@@ -37,7 +37,7 @@ export default class DialogService {
             }
 
             await this.cacheManager.set(newDialog.id, JSON.stringify(newDialog), this.cacheTime);
-            response.cookie('dialogId', newDialog.id, { httpOnly: true, secure: true, domain: 'luckydanyel.ru' });
+            response.cookie('dialogId', newDialog.id, { httpOnly: true, secure: true, domain: 'luckydanyel.ru', sameSite: 'lax', expires:new Date( new Date().getTime() + 3600) });
             return newDialog;
         } catch (error) {
             throw new BaseException({
