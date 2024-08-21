@@ -4,8 +4,9 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
+    const allowsDomains = JSON.parse(process.env.ALLOWS_DOMAINS);
     app.enableCors({
-        origin: ['https://test-luckydanyel.ru'],
+        origin: allowsDomains,
         credentials: true,
         allowedHeaders: ['Content-type']
     });

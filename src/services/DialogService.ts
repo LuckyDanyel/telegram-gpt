@@ -26,6 +26,8 @@ export default class DialogService {
             const cacheDialog = await this.getDialog(request);
             if(cacheDialog) return cacheDialog;
 
+            console.log(request.headers.date);
+
             const threadId = await this.threadService.createThread();
     
             const uuid = v4();
@@ -37,7 +39,13 @@ export default class DialogService {
             }
 
             await this.cacheManager.set(newDialog.id, JSON.stringify(newDialog), this.cacheTime);
-            response.cookie('dialogId', newDialog.id, { httpOnly: true, secure: true, domain: 'luckydanyel.ru', sameSite: 'none', expires:new Date( new Date().getTime() + 36000000000) });
+            response.cookie('dialogId', newDialog.id, { 
+                httpOnly: true, 
+                secure: true, 
+                domain: process.env.SERVER_DOMAIN, 
+                sameSite: 'none', 
+                expires: new Date(Date.now() + this.cacheTime)
+            });
             return newDialog;
         } catch (error) {
             throw new BaseException({
