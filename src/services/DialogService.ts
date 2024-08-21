@@ -6,6 +6,7 @@ import OpenAI from 'openai';
 import DialogEntitiy from 'src/entities/DialogEntitiy';
 import BaseException from 'src/exceptions/BaseException';
 import ThreadService from 'src/services/ThreadService';
+import CookieService from './CookieService';
 import { MessageDTO } from 'src/DTO';
 
 @Injectable()
@@ -16,6 +17,7 @@ export default class DialogService {
     constructor(
         @Inject(CACHE_MANAGER) private cacheManager: Cache,
         private readonly threadService: ThreadService,
+        private readonly cookieService: CookieService,
     ) {
         const dayMilliseconds = 24 * 60 * 60 * 1000
         this.cacheTime = dayMilliseconds;
@@ -37,14 +39,7 @@ export default class DialogService {
             }
 
             await this.cacheManager.set(newDialog.id, JSON.stringify(newDialog), this.cacheTime);
-            response.cookie('dialogId', newDialog.id, { 
-                httpOnly: true, 
-                secure: true, 
-                domain: process.env.SERVER_DOMAIN,
-                partitioned: true,
-                sameSite: 'lax', 
-                expires: new Date(Date.now() + this.cacheTime)
-            });
+            this.cookieService.set(response, 'dialogId', newDialog.id, { expires: this.cacheTime });
             return newDialog;
         } catch (error) {
             throw new BaseException({
