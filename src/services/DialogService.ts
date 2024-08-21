@@ -41,7 +41,7 @@ export default class DialogService {
                 httpOnly: true, 
                 secure: true, 
                 domain: process.env.SERVER_DOMAIN, 
-                sameSite: 'strict', 
+                sameSite: 'lax', 
                 expires: new Date(Date.now() + this.cacheTime)
             });
             return newDialog;
