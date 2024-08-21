@@ -42,7 +42,7 @@ export default class DialogService {
                 secure: true, 
                 domain: process.env.SERVER_DOMAIN,
                 partitioned: true,
-                sameSite: 'none', 
+                sameSite: 'strict', 
                 expires: new Date(Date.now() + this.cacheTime)
             });
             return newDialog;
