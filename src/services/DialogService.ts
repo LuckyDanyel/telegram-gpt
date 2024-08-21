@@ -40,7 +40,8 @@ export default class DialogService {
             response.cookie('dialogId', newDialog.id, { 
                 httpOnly: true, 
                 secure: true, 
-                domain: process.env.SERVER_DOMAIN, 
+                domain: process.env.SERVER_DOMAIN,
+                partitioned: true,
                 sameSite: 'none', 
                 expires: new Date(Date.now() + this.cacheTime)
             });
