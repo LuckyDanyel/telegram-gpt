@@ -12,7 +12,6 @@ export default class CookieService {
             secure: true, 
             domain: process.env.SERVER_DOMAIN,
             partitioned: true,
-            maxAge: 31536000,
             sameSite: 'none', 
             expires: new Date(Date.now() + options.expires)
         });
