@@ -8,7 +8,9 @@ async function bootstrap() {
     app.enableCors({
         origin: allowsDomains,
         credentials: true,
-        allowedHeaders: ['Content-type', 'Accept-language']
+        allowedHeaders: ['Content-type', 'Accept-language'],
+        maxAge: 31536000,
+        methods: ['GET', 'POST'],
     });
     app.use(cookieParser());
     await app.listen(3002);
