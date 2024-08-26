@@ -10,6 +10,7 @@ export default class CookieService {
         response.cookie(key, value, { 
             httpOnly: true, 
             secure: true, 
+            domain: 'test-luckydanyel.ru',
             partitioned: true,
             sameSite: 'none', 
             expires: new Date(Date.now() + options.expires)
