@@ -9,7 +9,6 @@ async function bootstrap() {
         origin: allowsDomains,
         credentials: true,
         allowedHeaders: ['Content-type', 'Accept-language'],
-        maxAge: 31536000,
         methods: ['GET', 'POST'],
     });
     app.use(cookieParser());
