@@ -12,6 +12,7 @@ export default class CookieService {
             secure: true,
             httpOnly: true,
             sameSite: 'strict',
+            partitioned: true,
             expires: new Date(Date.now() + options.expires)
         });
     }
