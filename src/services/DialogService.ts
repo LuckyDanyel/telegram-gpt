@@ -1,13 +1,12 @@
 import { Injectable, Inject, HttpStatus } from '@nestjs/common';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { v4 } from 'uuid';
-import { Request, Response } from 'express';
+import { Request } from 'express';
 import OpenAI from 'openai';
 import DialogEntitiy from 'src/entities/DialogEntitiy';
 import BaseException from 'src/exceptions/BaseException';
 import ThreadService from 'src/services/ThreadService';
-import CookieService from './CookieService';
-import { MessageDTO } from 'src/DTO';
+import { DialogDTO } from 'src/DTO';
 
 @Injectable()
 export default class DialogService {
@@ -17,15 +16,14 @@ export default class DialogService {
     constructor(
         @Inject(CACHE_MANAGER) private cacheManager: Cache,
         private readonly threadService: ThreadService,
-        private readonly cookieService: CookieService,
     ) {
         const dayMilliseconds = 24 * 60 * 60 * 1000
         this.cacheTime = dayMilliseconds;
     }
 
-    public async createDialog(request: Request, response: Response): Promise<DialogEntitiy> {
+    public async createDialog(dialog: DialogDTO): Promise<DialogEntitiy> {
         try {
-            const cacheDialog = await this.getDialog(request);
+            const cacheDialog = await this.getDialog(dialog);
             if(cacheDialog) return cacheDialog;
 
             const threadId = await this.threadService.createThread();
@@ -39,7 +37,6 @@ export default class DialogService {
             }
 
             await this.cacheManager.set(newDialog.id, JSON.stringify(newDialog), this.cacheTime);
-            this.cookieService.set(response, 'dialogId', newDialog.id, { expires: this.cacheTime });
             return newDialog;
         } catch (error) {
             throw new BaseException({
@@ -50,9 +47,10 @@ export default class DialogService {
         }
     }
 
-    public async getDialog(request: Request): Promise<null | DialogEntitiy> {
+    public async getDialog(dialog: DialogDTO): Promise<null | DialogEntitiy> {
         try {
-            const dialogId = request.cookies['dialogId'];
+            const dialogId = dialog.id;
+            
             const cacheDialog = await this.cacheManager.get<string>(dialogId);
             if(cacheDialog) {
                 return JSON.parse(cacheDialog);
@@ -103,25 +101,26 @@ export default class DialogService {
         }
     }
 
-    public async getDialogMessages(request: Request): Promise<OpenAI.Beta.Threads.Messages.Message[]> {
-        const dialogId = request.cookies['dialogId'];
-        const dialog: string = await this.cacheManager.get(dialogId);
-        if(!dialog) {
+    public async getDialogMessages(dialog: DialogDTO): Promise<OpenAI.Beta.Threads.Messages.Message[]> {
+        const dialogId = dialog.id;
+        const cacheDialog: string = await this.cacheManager.get(dialogId);
+        if(!cacheDialog) {
             return [];
         }
 
-        const parsedDialog: DialogEntitiy = JSON.parse(dialog);
+        const parsedDialog: DialogEntitiy = JSON.parse(cacheDialog);
 
         return this.threadService.getMessages(parsedDialog.threadId);   
     }
 
-    public async sendMessage(request: Request, reposnse: Response, messages: MessageDTO[]): Promise<{ dialogId: string, message: OpenAI.Beta.Threads.Messages.Message }> {
+    public async sendMessage(dialog: DialogDTO): Promise<{ dialogId: string, message: OpenAI.Beta.Threads.Messages.Message }> {
         try {
-            const dialog = await this.createDialog(request, reposnse);
-            const message = await this.threadService.sendMessage(dialog.threadId, messages);
+
+            const cacheDialog = await this.createDialog(dialog);
+            const message = await this.threadService.sendMessage(cacheDialog.threadId, dialog.messages);
             return {
                 message: message,
-                dialogId: dialog.id,
+                dialogId: cacheDialog.id,
             }
         } catch (error) {
             throw error;

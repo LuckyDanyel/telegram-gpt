@@ -1,3 +1,4 @@
 import { MessageDTO } from './MessageDTO';
+import { DialogDTO } from './DialogDTO';
 
-export { MessageDTO };
+export { MessageDTO, DialogDTO };

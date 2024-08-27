@@ -7,12 +7,10 @@ import OpenAIService from './services/OpenAIService';
 import ThreadService from './services/ThreadService';
 import DialogService from './services/DialogService';
 import DialogController from './controllers/DialogController';
-import CookieService from './services/CookieService';
-import DomainController from './controllers/DomainController';
 
 @Module({
   imports: [ConfigModule.forRoot(), CacheModule.register()],
-  controllers: [AssistantController, DialogController, DomainController],
-  providers: [AssistantService, OpenAIService, ThreadService, DialogService, CookieService],
+  controllers: [AssistantController, DialogController],
+  providers: [AssistantService, OpenAIService, ThreadService, DialogService],
 })
 export class AppModule {}
