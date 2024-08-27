@@ -15,30 +15,38 @@ async function bootstrap() {
     await app.listen(3010);
 
     bot.on('message', async (msg) => {
-
-        if(msg.from.username.includes('belletoille')) {
-            console.log(msg.from.username );
-
-            const messageDate = new Date();
+        try {
+            if(msg.from.username.includes('belletoille')) {
+                console.log(msg.from.username );
     
-            const differenceInMilliseconds = Math.abs(messageDate.getTime() - lateDate.getTime());
-            const differenceInHours = differenceInMilliseconds / (1000 * 60 * 60);
+                const messageDate = new Date();
+        
+                const differenceInMilliseconds = Math.abs(messageDate.getTime() - lateDate.getTime());
+                const differenceInHours = differenceInMilliseconds / (1000 * 60 * 60);
+        
+                if (differenceInHours === 1) {
+                    lateDate = new Date();
+                    messages = [];
+                }
+                const chatId = msg.chat.id;
+                messages.push({ role: 'user', content: msg.text });
+        
+                bot.sendChatAction(chatId, 'typing')
+                const chatCompletion = await client.chat.completions.create({
+                    messages: messages,
+                    model: 'gpt-4o',
+                });
     
-            if (differenceInHours === 1) {
-                lateDate = new Date();
-                messages = [];
+                if(chatCompletion?.choices[0]?.message?.content) {
+                    messages.push({ role: 'assistant', content: chatCompletion.choices[0].message.content });
+                    await bot.sendMessage(chatId, chatCompletion.choices[0].message.content);
+                } else {
+                   await bot.sendMessage(chatId, 'Подвиссссс.....');
+                }
+        
             }
-            const chatId = msg.chat.id;
-            messages.push({ role: 'user', content: msg.text });
-    
-            bot.sendChatAction(chatId, 'typing')
-            const chatCompletion = await client.chat.completions.create({
-                messages: messages,
-                model: 'gpt-4o',
-            });
-    
-            messages.push({ role: 'assistant', content: chatCompletion.choices[0].message.content });
-            await bot.sendMessage(chatId, chatCompletion.choices[0].message.content);
+        } catch (error) {
+            console.log(error);
         }
     });
 }
