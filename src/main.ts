@@ -16,7 +16,7 @@ async function bootstrap() {
 
     bot.on('message', async (msg) => {
 
-        if(true) {
+        if(msg.from.username.includes('belletoille')) {
             console.log(msg.from.username );
 
             const messageDate = new Date();
