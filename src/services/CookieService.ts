@@ -8,7 +8,9 @@ export default class CookieService {
 
     public set(response: Response, key: string, value: string, options: { expires: number }) {
         response.cookie(key, value, { 
-            domain: 'localhost',
+            domain: process.env.SERVER_DOMAIN,
+            secure: true,
+            httpOnly: true,
             sameSite: 'none',
             expires: new Date(Date.now() + options.expires)
         });
