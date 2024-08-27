@@ -11,7 +11,7 @@ export default class CookieService {
             domain: process.env.SERVER_DOMAIN,
             secure: true,
             httpOnly: true,
-            sameSite: 'none',
+            sameSite: 'strict',
             expires: new Date(Date.now() + options.expires)
         });
     }
