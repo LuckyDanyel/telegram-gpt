@@ -117,10 +117,31 @@ export default class DialogService {
 
     public async sendMessage(request: Request, reposnse: Response, messages: MessageDTO[]): Promise<{ dialogId: string, message: OpenAI.Beta.Threads.Messages.Message }> {
         try {
+
+            const message = {
+                "id": "msg_szAmsN1gW6nCv7fpMfQsC3nb",
+                "object": "thread.message",
+                "created_at": 1723815391,
+                "assistant_id": null,
+                "thread_id": "thread_S8xyYJDczGoRHk4cQJq5i9gE",
+                "run_id": null,
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": {
+                            "value": "Привет\n",
+                            "annotations": []
+                        }
+                    }
+                ],
+                "attachments": [],
+                "metadata": {}
+            } as any;
             const dialog = await this.createDialog(request, reposnse);
-            const message = await this.threadService.sendMessage(dialog.threadId, messages);
+            // const message = await this.threadService.sendMessage(dialog.threadId, messages);
             return {
-                message,
+                message: message,
                 dialogId: dialog.id,
             }
         } catch (error) {
