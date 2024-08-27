@@ -1,7 +1,7 @@
 import { Controller, Get, HttpStatus, HttpCode, Req, Res, HttpException } from '@nestjs/common';
 import { Request, Response } from 'express';
 
-@Controller('/')
+@Controller('/api')
 export default class DomainController {
 
     @HttpCode(HttpStatus.OK)
