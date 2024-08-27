@@ -13,7 +13,6 @@ export default class DomainController {
             <script>
                             
             function init() {
-            console.log('init');
                     async function getData(url, requestInit) {
                         try {
                           const data = await fetch(url, {
