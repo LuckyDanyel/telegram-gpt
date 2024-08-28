@@ -48,11 +48,11 @@ export default async function(msg: TelegramBot.Message, bot: TelegramBot, client
         fs.unlinkSync(userAudioPath);
     } catch (error) {
         console.log(error);
-        try {
+        if(fs.existsSync(assistantAudioPath)) {
             fs.unlinkSync(assistantAudioPath);
-            fs.unlinkSync(userAudioPath);   
-        } catch (error) {
-            
+        }
+        if(fs.existsSync(userAudioPath)) {
+            fs.unlinkSync(userAudioPath);  
         }
     }
 }
