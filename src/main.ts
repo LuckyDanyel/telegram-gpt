@@ -4,6 +4,7 @@ import * as TelegramBot from 'node-telegram-bot-api';
 import getTypeMessage from './getTypeMessage';
 import MessageProcess from './MessagesProcess';
 import ImagesProcess from './ImagesProcess';
+import VoiceProcess from './VoiceProcess';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -16,9 +17,9 @@ async function bootstrap() {
         const app = await NestFactory.create(AppModule);
         await app.listen(3010);
         const allowsUsers = ['luckydanyel', 'belletoille'];
-    
         bot.on('message', async (msg) => {
             if(allowsUsers.includes(msg.from.username)) {
+                if(getTypeMessage(msg) === 'voice') VoiceProcess(msg, bot, client);
                 if(getTypeMessage(msg) === 'message') MessageProcess(msg, bot, client);
                 if(getTypeMessage(msg) === 'image') ImagesProcess(msg, bot, client);
             }
