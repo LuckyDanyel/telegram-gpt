@@ -35,7 +35,7 @@ export default async function(msg: TelegramBot.Message, bot: TelegramBot, client
             {          
                 input: assistantData.choices[0]?.message?.content || '', 
                 model: 'tts-1-hd', 
-                voice: 'shimmer', 
+                voice: 'echo', 
                 response_format: 'mp3',
             }
         );
@@ -47,7 +47,12 @@ export default async function(msg: TelegramBot.Message, bot: TelegramBot, client
         fs.unlinkSync(assistantAudioPath);
         fs.unlinkSync(userAudioPath);
     } catch (error) {
-        fs.unlinkSync(assistantAudioPath);
-        fs.unlinkSync(userAudioPath);
+        console.log(error);
+        try {
+            fs.unlinkSync(assistantAudioPath);
+            fs.unlinkSync(userAudioPath);   
+        } catch (error) {
+            
+        }
     }
 }
