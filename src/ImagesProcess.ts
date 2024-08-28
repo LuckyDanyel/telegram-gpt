@@ -1,7 +1,8 @@
 import TelegramBot from "node-telegram-bot-api";
 import OpenAI from "openai";
+import GPTCache from "./GPTCache";
 
-
+const gptCache = new GPTCache();
 
 export default async function MessageProcess(msg: TelegramBot.Message, bot: TelegramBot, client: OpenAI) {
 
@@ -10,6 +11,7 @@ export default async function MessageProcess(msg: TelegramBot.Message, bot: Tele
     const path = await bot.getFileLink(photo.file_id)
     const chatId = msg.chat.id;
     bot.sendChatAction(chatId, 'typing');
+    gptCache.addMessage(msg.chat.id, { role: 'user', content: path });
     const chatCompletion = await client.chat.completions.create({
         messages: [{
             role: 'user',
@@ -31,6 +33,7 @@ export default async function MessageProcess(msg: TelegramBot.Message, bot: Tele
     });
 
     if(chatCompletion.choices[0]?.message?.content) {
+        gptCache.addMessage(msg.chat.id, { role: 'assistant', content: chatCompletion.choices[0]?.message?.content });
         bot.sendMessage(chatId, chatCompletion.choices[0]?.message?.content);
     } else {
         bot.sendMessage(chatId, 'Ошибка загрузки картинки - Подвиссссс.....');

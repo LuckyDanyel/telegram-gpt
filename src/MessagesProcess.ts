@@ -1,8 +1,8 @@
 import TelegramBot from "node-telegram-bot-api";
 import OpenAI from "openai";
+import GPTCache from "./GPTCache";
 
-let messages = [];
-let lateDate = new Date();
+const gptCache = new GPTCache();
 
 function modelFunctions(): OpenAI.ChatCompletionCreateParams.Function[] {
     return [
@@ -32,9 +32,10 @@ async function generateImage(message: OpenAI.ChatCompletion.Choice['message'], u
             response_format: 'url',
             size: '1024x1024',
         });
+        const url = data.data[0].url;
+        gptCache.addMessage(userMsg.chat.id, { role: 'assistant', content: url })
         clearInterval(interval);
         bot.sendChatAction(userMsg.chat.id, 'upload_photo');
-        const url = data.data[0].url;
         bot.sendPhoto(userMsg.chat.id, url);
     } catch (error) {
         console.log(error);
@@ -44,7 +45,8 @@ async function generateImage(message: OpenAI.ChatCompletion.Choice['message'], u
 
 function generateText(message: OpenAI.ChatCompletion.Choice['message'], userMsg: TelegramBot.Message, bot: TelegramBot, client: OpenAI): void {
     if(message?.content) {
-        messages.push({ role: 'assistant', content: message.content });
+        
+        gptCache.addMessage(userMsg.chat.id, { role: 'assistant', content: message.content })
         bot.sendMessage( userMsg.chat.id, message.content);
     } else {
         bot.sendMessage( userMsg.chat.id, 'Генерация текста - Подвиссссс.....');
@@ -63,21 +65,12 @@ function generateAnswer(message: OpenAI.ChatCompletion.Choice['message'], userMs
 
 export default async function MessageProcess(msg: TelegramBot.Message, bot: TelegramBot, client: OpenAI) {
 
-    const messageDate = new Date();
-        
-    const differenceInMilliseconds = Math.abs(messageDate.getTime() - lateDate.getTime());
-    const differenceInHours = differenceInMilliseconds / (1000 * 60 * 60);
-
-    if (differenceInHours === 1) {
-        lateDate = new Date();
-        messages = [];
-    }
     const chatId = msg.chat.id;
-    messages.push({ role: 'user', content: msg.text });
+    gptCache.addMessage(chatId, { role: 'user', content: msg.text });
 
-    await bot.sendChatAction(chatId, 'typing');
+    bot.sendChatAction(chatId, 'typing');
     const chatCompletion = await client.chat.completions.create({
-        messages: messages,
+        messages: gptCache.getMessages(chatId),
         model: 'gpt-4o',
         functions: modelFunctions(),
     });

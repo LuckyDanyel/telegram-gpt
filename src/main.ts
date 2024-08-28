@@ -15,9 +15,10 @@ async function bootstrap() {
         const bot = new TelegramBot(process.env.BOT_TOKEN, {polling: true});
         const app = await NestFactory.create(AppModule);
         await app.listen(3010);
+        const allowsUsers = ['luckydanyel', 'belletoille'];
     
         bot.on('message', async (msg) => {
-            if(msg.from.username.includes('belletoille')) {
+            if(allowsUsers.includes(msg.from.username)) {
                 if(getTypeMessage(msg) === 'message') MessageProcess(msg, bot, client);
                 if(getTypeMessage(msg) === 'image') ImagesProcess(msg, bot, client);
             }
