@@ -30,6 +30,7 @@ async function generateImage(message: OpenAI.ChatCompletion.Choice['message'], u
             prompt: message.function_call.arguments,
             model: 'dall-e-3',
             response_format: 'url',
+            quality: 'standard',
             size: '1024x1024',
         });
         const url = data.data[0].url;
