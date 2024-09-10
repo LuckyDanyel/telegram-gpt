@@ -27,7 +27,7 @@ export default async function(msg: TelegramBot.Message, bot: TelegramBot, client
         bot.sendChatAction(msg.chat.id, 'record_voice');
         const assistantData = await client.chat.completions.create({
             messages: gptCache.getMessages(msg.chat.id),
-            model: 'gpt-4o',
+            model: 'gpt-4o-mini',
         })
         bot.sendChatAction(msg.chat.id, 'record_voice');
         gptCache.addMessage(msg.chat.id, { role: 'user', content: assistantData.choices[0]?.message?.content });
