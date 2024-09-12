@@ -72,7 +72,7 @@ export default async function MessageProcess(msg: TelegramBot.Message, bot: Tele
     bot.sendChatAction(chatId, 'typing');
     const chatCompletion = await client.chat.completions.create({
         messages: gptCache.getMessages(chatId),
-        model: 'o1-mini',
+        model: 'gpt-4o-mini-2024-07-18',
         functions: modelFunctions(),
     });
     generateAnswer(chatCompletion.choices[0].message, msg, bot, client);

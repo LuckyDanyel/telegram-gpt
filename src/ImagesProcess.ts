@@ -29,7 +29,7 @@ export default async function MessageProcess(msg: TelegramBot.Message, bot: Tele
                 }
             ]
         }],
-        model: 'gpt-4o-mini',
+        model: 'gpt-4o-mini-2024-07-18',
     });
 
     if(chatCompletion.choices[0]?.message?.content) {
