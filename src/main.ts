@@ -16,7 +16,7 @@ async function bootstrap() {
         const bot = new TelegramBot(process.env.BOT_TOKEN, {polling: true});
         const app = await NestFactory.create(AppModule);
         await app.listen(3010);
-        const allowsUsers = ['luckydanyel', 'belletoille', 'oksana_30_09', 'Alyona_0609'];
+        const allowsUsers = JSON.parse(process.env.ALLOWS_USERS);
         bot.on('message', async (msg) => {
             if(allowsUsers.includes(msg.from.username)) {
                 if(getTypeMessage(msg) === 'voice') VoiceProcess(msg, bot, client);
@@ -25,6 +25,7 @@ async function bootstrap() {
             }
         });        
     } catch (error) {
+        console.log(error);
         console.log('erorr');
         // console.log(error);
     }
